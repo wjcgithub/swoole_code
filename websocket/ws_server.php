@@ -19,6 +19,8 @@ class Server
 
     public function __construct()
     {
+        global $cfg_table;
+        $cfg_table['coc']=['classid','id'];
         $this->server = new swoole_websocket_server(self::WSHOST, self::WSPORT);
         $this->server->set([
             'worker_num' => 8,
@@ -45,10 +47,10 @@ class Server
 
     public function onWorkerStart(swoole_server $server, $worker_id)
     {
+        $this->createDb();
         if ($worker_id == 0) {
             $this->server->tick(500, [$this, 'onTick']);
         }
-
     }
 
     public function onMessage(swoole_websocket_server $server, $frame)
@@ -86,6 +88,8 @@ class Server
         } catch (Exception $e) {
             return [];
         }
+
+        return $result;
     }
 
     /**
@@ -98,8 +102,8 @@ class Server
 
     public function onTick()
     {
-        $sql = 'select is_update from tmp_record limit 1';
-        $update = 'update tmp_record set is_update=0';
+        $sql = 'select classid from coc limit 1';
+        $update = 'update coc set classid=0';
         try {
             $statement = $this->pdo->prepare($sql);
             $statement->execute();
@@ -107,7 +111,7 @@ class Server
             if ($result === false) {
                 return;
             }
-            if ($result['is_udpate'] == 1) {
+            if ($result['classid'] != 0) {
                 $this->update();
             }
             $statement = $this->pdo->prepare($update);
@@ -118,3 +122,5 @@ class Server
 
     }
 }
+
+new Server();
