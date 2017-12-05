@@ -90,6 +90,7 @@
 
     websocket.onmessage = function (evt) {
         console.log('Retrieved data from server:' + evt.data);
+        setTable2(evt.data);
     }
 
     websocket.onerror = function (evt) {
@@ -98,11 +99,11 @@
 
     function setTable2(data) {
         data = eval("(" + data + ")");
-        setTbody(data['table1'], '1');
-        setTbody(data['table2'], '2');
-        setTbody(data['table3'], '3');
-        setTbody(data['table4'], '4');
-        setTbody(data['table5'], '5');
+        setTbody(data['coc'], '1');
+//        setTbody(data['table2'], '2');
+//        setTbody(data['table3'], '3');
+//        setTbody(data['table4'], '4');
+//        setTbody(data['table5'], '5');
     }
 
     function setTbody(data, tableNUm) {
@@ -113,6 +114,7 @@
             for (var column in data[line]){
                 var newColumn = document.createElement('td');
                 newColumn.innerHTML = data[line][column];
+                tableBody.appendChild(newColumn);
             }
         }
     }
